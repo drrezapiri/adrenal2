@@ -66,14 +66,17 @@ with col2:
             st.warning("Missing input: Please provide lesion size and select at least one imaging modality.")
         else:
             benign_reasons = []
+            malignant_reasons = []
+            abs_washout = rel_washout = None
 
             try:
                 size_value = float(mass_size) if mass_size else None
                 non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
                 venous_val = float(venous_phase_hu) if venous_phase_hu else None
+                delayed_val = float(delayed_hu) if delayed_hu else None
             except ValueError:
                 st.warning("Please make sure HU and size values are valid numbers.")
-                size_value = non_contrast_val = venous_val = None
+                size_value = non_contrast_val = venous_val = delayed_val = None
 
             if macro_fat:
                 benign_reasons.append("macroscopic fat")
@@ -88,14 +91,53 @@ with col2:
             if mass_dev == "No prior scanning" or mass_dev == "Increased <5 mm/year":
                 benign_reasons.append("no significant growth")
             if non_contrast_val is not None and venous_val is not None:
-                if venous_val - non_contrast_val < 6:
-                    benign_reasons.append("no enhancement (HU change < 6)")
+                if venous_val - non_contrast_val < 10:
+                    benign_reasons.append("no enhancement (HU change < 10)")
+
+            # Malignant features
+            if venous_val is not None and non_contrast_val is not None:
+                if venous_val - non_contrast_val > 10:
+                    malignant_reasons.append("enhancement (HU change > 10)")
+            elif venous_val is not None and non_contrast_val is None:
+                if venous_val > 40:
+                    malignant_reasons.append("HU venous > 40 (no non-contrast available)")
+
+            if bilateral:
+                malignant_reasons.append("bilateral finding")
+            if mass_dev == "Increased >5 mm/year":
+                malignant_reasons.append("growth > 5 mm/year")
+            if size_value is not None and size_value > 40:
+                malignant_reasons.append("size > 4 cm")
+            if heterogenicity == "Heterogen":
+                malignant_reasons.append("heterogenicity")
+
+            # Washout calculations
+            if venous_val is not None and delayed_val is not None and non_contrast_val is not None:
+                try:
+                    abs_washout = ((venous_val - delayed_val) / (venous_val - non_contrast_val)) * 100
+                    rel_washout = ((venous_val - delayed_val) / venous_val) * 100
+
+                    st.markdown(f"**Absolute washout**: {abs_washout:.1f}%")
+                    st.markdown(f"**Relative washout**: {rel_washout:.1f}%")
+
+                    if abs_washout < 60:
+                        malignant_reasons.append("absolute washout < 60%")
+                    if rel_washout < 40:
+                        malignant_reasons.append("relative washout < 40%")
+
+                except ZeroDivisionError:
+                    st.warning("Division by zero in washout calculation. Check HU values.")
 
             if benign_reasons:
                 reasons_text = ", ".join(benign_reasons)
                 st.success(f"The following features suggest a probably benign etiology: {reasons_text}.")
-            else:
-                st.info("No strong benign indicators found. Further evaluation may be needed.")
+
+            if malignant_reasons:
+                reasons_text = ", ".join(malignant_reasons)
+                st.error(f"The following features suggest a probably malignant etiology: {reasons_text}.")
+
+            if not benign_reasons and not malignant_reasons:
+                st.info("No strong benign or malignant indicators found. Further evaluation may be needed.")
 
 # Column 3 placeholder
 with col3:
