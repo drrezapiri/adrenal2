@@ -1,20 +1,6 @@
-import streamlit as st
+# Column 1, 2, 3 Together
+col1, col2, col3 = st.columns([1, 1, 1])
 
-# Set page configuration
-st.set_page_config(
-    page_title="Adrenal Mass Approach",
-    page_icon="🩺",
-    layout="wide"
-)
-
-# Title and credits
-st.title("Adrenal Mass Approach")
-st.caption("Credits: Peter Sommer Ulriksen and Reza Piri from Radiology Department in Rigshospitalet")
-
-# Create three columns
-col1, col2, col3 = st.columns(3)
-
-# Column 1: Input Data
 with col1:
     st.header("Input Data")
     age = st.text_input("Age")
@@ -57,7 +43,6 @@ with col1:
     st.markdown("---")
     assess_button = st.button("Assess")
 
-# Column 2: Diagnostic Interpretation
 with col2:
     st.header("Preliminary Interpretation")
 
@@ -92,13 +77,12 @@ with col2:
                 benign_reasons.append("HU non-contrast ≤ 10")
             if venous_val is not None and venous_val <= 10:
                 benign_reasons.append("HU venous ≤ 10")
-            if mass_dev == "No prior scanning" or mass_dev == "Increased <5 mm/year":
-                benign_reasons.append("no significant growth")
+            if mass_dev == "Increased <5 mm/year":
+                benign_reasons.append("growth < 5 mm/year")
             if non_contrast_val is not None and venous_val is not None:
                 if venous_val - non_contrast_val < 10:
                     benign_reasons.append("no enhancement (HU change < 10)")
 
-            # Malignant features
             if venous_val is not None and non_contrast_val is not None:
                 if venous_val - non_contrast_val > 10:
                     malignant_reasons.append("enhancement (HU change > 10)")
@@ -115,8 +99,10 @@ with col2:
                 malignant_reasons.append("size > 4 cm")
             if heterogenicity == "Heterogen":
                 malignant_reasons.append("heterogenicity")
+            if history_cancer:
+                malignant_reasons.append("history of cancer")
+                complementary_comments.append("History of cancer increases the risk of metastasis.")
 
-            # Washout calculations
             if venous_val is not None and delayed_val is not None and non_contrast_val is not None:
                 try:
                     abs_washout = ((venous_val - delayed_val) / (venous_val - non_contrast_val)) * 100
@@ -133,7 +119,6 @@ with col2:
                 except ZeroDivisionError:
                     st.warning("Division by zero in washout calculation. Check HU values.")
 
-            # Complementary interpretations
             if non_contrast_val is not None and non_contrast_val > 20:
                 complementary_comments.append("Due to HU > 20, check plasma metanephrines.")
             if heterogenicity == "Heterogen":
@@ -148,7 +133,6 @@ with col2:
             if size_value is not None and size_value < 50:
                 complementary_comments.append("Probability of adrenal carcinoma is very low due to size < 5 cm.")
 
-            # Probability comments
             if reason_referral == "Cancer work-up":
                 probability_comments.append("The risk of malignancy because of the referral reason is 43%.")
             elif reason_referral == "Hormonal imbalance":
@@ -191,11 +175,71 @@ with col2:
                 st.markdown("### Probabilities")
                 for comment in probability_comments:
                     st.write("- " + comment)
-
-            if not benign_reasons and not malignant_reasons:
-                st.info("No strong benign or malignant indicators found. Further evaluation may be needed.")
-
-# Column 3 placeholder
 with col3:
-    st.header("")
-    st.markdown("(Reserved for tips, references or diagnostic suggestions)")
+    st.header("Final Conclusion")
+
+    final_conclusion = ""
+
+    if assess_button:
+        malignant_present = len(malignant_reasons) > 0
+        selected_malignant = ", ".join(malignant_reasons)
+
+        if macro_fat:
+            if malignant_present:
+                final_conclusion = f"Findings are consistent with a myelolipoma; however, due to malignant features ({selected_malignant}), control of the mass with adrenal CT is recommended."
+            else:
+                final_conclusion = "Findings are consistent with a myelolipoma. No follow-up needed."
+
+        elif (non_contrast_val is not None and venous_val is not None) and (venous_val - non_contrast_val < 10) and venous_val > 20:
+            if malignant_present:
+                final_conclusion = f"Enhancement pattern suggests hematoma, but due to malignant features ({selected_malignant}), control of the mass with adrenal CT is recommended."
+            else:
+                final_conclusion = "Enhancement pattern suggests hematoma. No follow-up needed."
+
+        elif (non_contrast_val is not None and non_contrast_val <= 10) or (venous_val is not None and venous_val <= 10):
+            if malignant_present:
+                final_conclusion = f"Low attenuation suggests a benign lesion; however, malignant features ({selected_malignant}) are present. Biochemical assays are recommended."
+            else:
+                final_conclusion = "Low attenuation suggests a benign lesion. No follow-up needed."
+
+        elif calcification:
+            if malignant_present:
+                final_conclusion = f"Calcifications are benign indicators; however, due to malignant features ({selected_malignant}), control of the mass with adrenal CT is recommended and biochemical assays should be performed."
+            else:
+                final_conclusion = "Calcifications suggest a benign lesion. No follow-up needed."
+
+        elif size_value is not None and 10 <= size_value <= 40:
+            if mass_dev == "Increased <5 mm/year":
+                if malignant_present:
+                    final_conclusion = f"Stable size supports a benign diagnosis; however, malignant features ({selected_malignant}) are present. Biochemical assays are recommended."
+                else:
+                    final_conclusion = "Stable size supports a benign diagnosis. No follow-up needed. In case of clinical suspicion, biochemical assays may be considered."
+            elif mass_dev == "Increased >5 mm/year" or mass_dev == "In doubt":
+                if history_cancer:
+                    final_conclusion = "Due to growth and history of cancer, biopsy or PET-CT evaluation along with biochemical assays is recommended."
+                else:
+                    final_conclusion = "Due to growth without history of cancer, control with adrenal CT or resection should be considered. Biochemical assays may also be indicated."
+
+        elif size_value is not None and 10 <= size_value <= 40 and not history_cancer and mass_dev == "No prior scanning":
+            if size_value < 20:
+                final_conclusion = "Probably benign lesion based on small size. Biochemical assays to determine functional status may be considered."
+            elif (size_value >= 20 and size_value <= 40):
+                if (non_contrast_val is None or venous_val is None or delayed_val is None):
+                    final_conclusion = "Incomplete imaging characterization. Recommend adrenal CT follow-up at 12 months."
+                else:
+                    if venous_val - non_contrast_val < 10:
+                        final_conclusion = "Imaging characteristics suggest a benign lesion. No follow-up needed."
+                    elif abs_washout is not None and rel_washout is not None:
+                        if abs_washout > 60 and rel_washout > 40:
+                            final_conclusion = "High washout values suggest a benign lesion. No follow-up needed. Biochemical assays may be considered."
+                        else:
+                            final_conclusion = "Suboptimal washout characteristics. Depending on clinical context, control with adrenal CT, biopsy, PET-CT, or resection should be considered. Biochemical assays are recommended."
+
+        elif size_value is not None and size_value >= 40:
+            if history_cancer:
+                final_conclusion = "Large mass in patient with cancer history. Biopsy or PET-CT and biochemical assays are recommended."
+            else:
+                final_conclusion = "Large mass without cancer history. Surgical resection and biochemical assays are recommended."
+
+    if final_conclusion:
+        st.success(final_conclusion)
