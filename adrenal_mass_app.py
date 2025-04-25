@@ -62,37 +62,40 @@ with col2:
     st.header("Preliminary Interpretation")
 
     if assess_button:
-        benign_reasons = []
-
-        try:
-            size_value = float(mass_size) if mass_size else None
-            non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
-            venous_val = float(venous_phase_hu) if venous_phase_hu else None
-        except ValueError:
-            st.warning("Please make sure HU and size values are valid numbers.")
-            size_value = non_contrast_val = venous_val = None
-
-        if macro_fat:
-            benign_reasons.append("macroscopic fat")
-        if calcification:
-            benign_reasons.append("calcification")
-        if size_value is not None and size_value < 10:
-            benign_reasons.append("size smaller than 1 cm")
-        if non_contrast_val is not None and non_contrast_val <= 10:
-            benign_reasons.append("HU non-contrast ≤ 10")
-        if venous_val is not None and venous_val <= 10:
-            benign_reasons.append("HU venous ≤ 10")
-        if mass_dev == "No prior scanning" or mass_dev == "Increased <5 mm/year":
-            benign_reasons.append("no significant growth")
-        if non_contrast_val is not None and venous_val is not None:
-            if venous_val - non_contrast_val < 6:
-                benign_reasons.append("no enhancement (HU change < 6)")
-
-        if benign_reasons:
-            reasons_text = ", ".join(benign_reasons)
-            st.success(f"The following features suggest a probably benign etiology: {reasons_text}.")
+        if not mass_size or (not use_nc_ct and not use_ce_ct):
+            st.warning("Missing input: Please provide lesion size and select at least one imaging modality.")
         else:
-            st.info("No strong benign indicators found. Further evaluation may be needed.")
+            benign_reasons = []
+
+            try:
+                size_value = float(mass_size) if mass_size else None
+                non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
+                venous_val = float(venous_phase_hu) if venous_phase_hu else None
+            except ValueError:
+                st.warning("Please make sure HU and size values are valid numbers.")
+                size_value = non_contrast_val = venous_val = None
+
+            if macro_fat:
+                benign_reasons.append("macroscopic fat")
+            if calcification:
+                benign_reasons.append("calcification")
+            if size_value is not None and size_value < 10:
+                benign_reasons.append("size smaller than 1 cm")
+            if non_contrast_val is not None and non_contrast_val <= 10:
+                benign_reasons.append("HU non-contrast ≤ 10")
+            if venous_val is not None and venous_val <= 10:
+                benign_reasons.append("HU venous ≤ 10")
+            if mass_dev == "No prior scanning" or mass_dev == "Increased <5 mm/year":
+                benign_reasons.append("no significant growth")
+            if non_contrast_val is not None and venous_val is not None:
+                if venous_val - non_contrast_val < 6:
+                    benign_reasons.append("no enhancement (HU change < 6)")
+
+            if benign_reasons:
+                reasons_text = ", ".join(benign_reasons)
+                st.success(f"The following features suggest a probably benign etiology: {reasons_text}.")
+            else:
+                st.info("No strong benign indicators found. Further evaluation may be needed.")
 
 # Column 3 placeholder
 with col3:
