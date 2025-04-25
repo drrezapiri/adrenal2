@@ -67,6 +67,7 @@ with col2:
         else:
             benign_reasons = []
             malignant_reasons = []
+            complementary_comments = []
             abs_washout = rel_washout = None
 
             try:
@@ -80,6 +81,7 @@ with col2:
 
             if macro_fat:
                 benign_reasons.append("macroscopic fat")
+                complementary_comments.append("Probably myelolipoma – no follow-up needed.")
             if calcification:
                 benign_reasons.append("calcification")
             if size_value is not None and size_value < 10:
@@ -104,6 +106,7 @@ with col2:
 
             if bilateral:
                 malignant_reasons.append("bilateral finding")
+                complementary_comments.append("Due to bilateral findings, consider pheochromocytoma, bilateral macronodular hyperplasia, congenital adrenal hyperplasia, ACTH-dependent Cushing, lymphoma, infection, bleeding, metastasis, granulomatous disease or 21-hydroxylase deficiency.")
             if mass_dev == "Increased >5 mm/year":
                 malignant_reasons.append("growth > 5 mm/year")
             if size_value is not None and size_value > 40:
@@ -128,6 +131,21 @@ with col2:
                 except ZeroDivisionError:
                     st.warning("Division by zero in washout calculation. Check HU values.")
 
+            # Complementary interpretations
+            if non_contrast_val is not None and non_contrast_val > 20:
+                complementary_comments.append("Due to HU > 20, check plasma metanephrines.")
+            if heterogenicity == "Heterogen":
+                complementary_comments.append("Due to heterogenicity, check plasma metanephrines.")
+            if venous_val is not None and venous_val > 120:
+                complementary_comments.append("HU venous > 120 – consider hypervascular tumors such as RCC, HCC, or pheochromocytoma.")
+            if delayed_val is not None and delayed_val > 120:
+                complementary_comments.append("HU delayed > 120 – consider hypervascular tumors such as RCC, HCC, or pheochromocytoma.")
+            if all(v is not None and v > 20 for v in [non_contrast_val, venous_val, delayed_val]) and \
+               abs(non_contrast_val - venous_val) < 6 and abs(non_contrast_val - delayed_val) < 6:
+                complementary_comments.append("Probably hematoma – no follow-up needed.")
+            if size_value is not None and size_value < 50:
+                complementary_comments.append("Probability of adrenal carcinoma is very low due to size < 5 cm.")
+
             if benign_reasons:
                 reasons_text = ", ".join(benign_reasons)
                 st.success(f"The following features suggest a probably benign etiology: {reasons_text}.")
@@ -135,6 +153,11 @@ with col2:
             if malignant_reasons:
                 reasons_text = ", ".join(malignant_reasons)
                 st.error(f"The following features suggest a probably malignant etiology: {reasons_text}.")
+
+            if complementary_comments:
+                st.markdown("### Complementary Interpretations")
+                for comment in complementary_comments:
+                    st.write("- " + comment)
 
             if not benign_reasons and not malignant_reasons:
                 st.info("No strong benign or malignant indicators found. Further evaluation may be needed.")
