@@ -31,6 +31,8 @@ with col1:
     use_nc_ct = st.checkbox("Non-contrast CT")
     use_ce_ct = st.checkbox("Contrast enhanced CT")
 
+    non_contrast_hu = venous_phase_hu = delayed_hu = ""
+
     if use_nc_ct:
         non_contrast_hu = st.text_input("Non-contrast HU")
 
@@ -52,11 +54,47 @@ with col1:
     cystic = st.checkbox("Cystic")
     calcification = st.checkbox("Calcification")
 
-# Column 2 and 3 placeholders for future content
-with col2:
-    st.header("")
-    st.markdown("(Reserved for analysis output or images)")
+    st.markdown("---")
+    assess_button = st.button("Assess")
 
+# Column 2: Diagnostic Interpretation
+with col2:
+    st.header("Preliminary Interpretation")
+
+    if assess_button:
+        benign_reasons = []
+
+        try:
+            size_value = float(mass_size) if mass_size else None
+            non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
+            venous_val = float(venous_phase_hu) if venous_phase_hu else None
+        except ValueError:
+            st.warning("Please make sure HU and size values are valid numbers.")
+            size_value = non_contrast_val = venous_val = None
+
+        if macro_fat:
+            benign_reasons.append("macroscopic fat")
+        if calcification:
+            benign_reasons.append("calcification")
+        if size_value is not None and size_value < 10:
+            benign_reasons.append("size smaller than 1 cm")
+        if non_contrast_val is not None and non_contrast_val <= 10:
+            benign_reasons.append("HU non-contrast ≤ 10")
+        if venous_val is not None and venous_val <= 10:
+            benign_reasons.append("HU venous ≤ 10")
+        if mass_dev == "No prior scanning" or mass_dev == "Increased <5 mm/year":
+            benign_reasons.append("no significant growth")
+        if non_contrast_val is not None and venous_val is not None:
+            if venous_val - non_contrast_val < 6:
+                benign_reasons.append("no enhancement (HU change < 6)")
+
+        if benign_reasons:
+            reasons_text = ", ".join(benign_reasons)
+            st.success(f"The following features suggest a probably benign etiology: {reasons_text}.")
+        else:
+            st.info("No strong benign indicators found. Further evaluation may be needed.")
+
+# Column 3 placeholder
 with col3:
     st.header("")
     st.markdown("(Reserved for tips, references or diagnostic suggestions)")
