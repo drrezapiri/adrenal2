@@ -68,6 +68,7 @@ with col2:
             benign_reasons = []
             malignant_reasons = []
             complementary_comments = []
+            probability_comments = []
             abs_washout = rel_washout = None
 
             try:
@@ -75,9 +76,10 @@ with col2:
                 non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
                 venous_val = float(venous_phase_hu) if venous_phase_hu else None
                 delayed_val = float(delayed_hu) if delayed_hu else None
+                age_val = int(age) if age else None
             except ValueError:
-                st.warning("Please make sure HU and size values are valid numbers.")
-                size_value = non_contrast_val = venous_val = delayed_val = None
+                st.warning("Please make sure age, HU, and size values are valid numbers.")
+                size_value = non_contrast_val = venous_val = delayed_val = age_val = None
 
             if macro_fat:
                 benign_reasons.append("macroscopic fat")
@@ -146,6 +148,32 @@ with col2:
             if size_value is not None and size_value < 50:
                 complementary_comments.append("Probability of adrenal carcinoma is very low due to size < 5 cm.")
 
+            # Probability comments
+            if reason_referral == "Cancer work-up":
+                probability_comments.append("The risk of malignancy because of the referral reason is 43%.")
+            elif reason_referral == "Hormonal imbalance":
+                probability_comments.append("The risk of malignancy because of the referral reason is 3%.")
+            elif reason_referral == "Incidentaloma":
+                probability_comments.append("The risk of malignancy because of the referral reason is 3%.")
+
+            if age_val is not None:
+                if age_val < 18:
+                    probability_comments.append("Age-related risk of malignancy is 62%.")
+                elif 18 <= age_val <= 39:
+                    probability_comments.append("Age-related risk of malignancy is 4%.")
+                elif 40 <= age_val <= 65:
+                    probability_comments.append("Age-related risk of malignancy is 6%.")
+                elif age_val > 65:
+                    probability_comments.append("Age-related risk of malignancy is 11%.")
+
+            if size_value is not None:
+                if size_value < 40:
+                    probability_comments.append("Size-related risk of malignancy is 2%.")
+                elif 40 <= size_value <= 60:
+                    probability_comments.append("Size-related risk of malignancy is 6%.")
+                elif size_value > 60:
+                    probability_comments.append("Size-related risk of adrenal carcinoma is 25% and for metastasis is 18%.")
+
             if benign_reasons:
                 reasons_text = ", ".join(benign_reasons)
                 st.success(f"The following features suggest a probably benign etiology: {reasons_text}.")
@@ -157,6 +185,11 @@ with col2:
             if complementary_comments:
                 st.markdown("### Complementary Interpretations")
                 for comment in complementary_comments:
+                    st.write("- " + comment)
+
+            if probability_comments:
+                st.markdown("### Probabilities")
+                for comment in probability_comments:
                     st.write("- " + comment)
 
             if not benign_reasons and not malignant_reasons:
