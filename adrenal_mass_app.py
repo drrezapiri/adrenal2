@@ -1,6 +1,20 @@
-# Column 1, 2, 3 Together
-col1, col2, col3 = st.columns([1, 1, 1])
+import streamlit as st
 
+# Set page configuration
+st.set_page_config(
+    page_title="Adrenal Mass Approach",
+    page_icon="🩺",
+    layout="wide"
+)
+
+# Title and credits
+st.title("Adrenal Mass Approach")
+st.caption("Credits: Peter Sommer Ulriksen and Reza Piri from Radiology Department in Rigshospitalet")
+
+# Create three columns
+col1, col2, col3 = st.columns(3)
+
+# Column 1: Input Data
 with col1:
     st.header("Input Data")
     age = st.text_input("Age")
@@ -43,6 +57,7 @@ with col1:
     st.markdown("---")
     assess_button = st.button("Assess")
 
+# Column 2: Diagnostic Interpretation
 with col2:
     st.header("Preliminary Interpretation")
 
@@ -77,12 +92,13 @@ with col2:
                 benign_reasons.append("HU non-contrast ≤ 10")
             if venous_val is not None and venous_val <= 10:
                 benign_reasons.append("HU venous ≤ 10")
-            if mass_dev == "Increased <5 mm/year":
-                benign_reasons.append("growth < 5 mm/year")
+            if mass_dev == "No prior scanning" or mass_dev == "Increased <5 mm/year":
+                benign_reasons.append("no significant growth")
             if non_contrast_val is not None and venous_val is not None:
                 if venous_val - non_contrast_val < 10:
                     benign_reasons.append("no enhancement (HU change < 10)")
 
+            # Malignant features
             if venous_val is not None and non_contrast_val is not None:
                 if venous_val - non_contrast_val > 10:
                     malignant_reasons.append("enhancement (HU change > 10)")
@@ -99,10 +115,8 @@ with col2:
                 malignant_reasons.append("size > 4 cm")
             if heterogenicity == "Heterogen":
                 malignant_reasons.append("heterogenicity")
-            if history_cancer:
-                malignant_reasons.append("history of cancer")
-                complementary_comments.append("History of cancer increases the risk of metastasis.")
 
+            # Washout calculations
             if venous_val is not None and delayed_val is not None and non_contrast_val is not None:
                 try:
                     abs_washout = ((venous_val - delayed_val) / (venous_val - non_contrast_val)) * 100
@@ -119,6 +133,7 @@ with col2:
                 except ZeroDivisionError:
                     st.warning("Division by zero in washout calculation. Check HU values.")
 
+            # Complementary interpretations
             if non_contrast_val is not None and non_contrast_val > 20:
                 complementary_comments.append("Due to HU > 20, check plasma metanephrines.")
             if heterogenicity == "Heterogen":
@@ -133,6 +148,7 @@ with col2:
             if size_value is not None and size_value < 50:
                 complementary_comments.append("Probability of adrenal carcinoma is very low due to size < 5 cm.")
 
+            # Probability comments
             if reason_referral == "Cancer work-up":
                 probability_comments.append("The risk of malignancy because of the referral reason is 43%.")
             elif reason_referral == "Hormonal imbalance":
@@ -175,6 +191,11 @@ with col2:
                 st.markdown("### Probabilities")
                 for comment in probability_comments:
                     st.write("- " + comment)
+
+            if not benign_reasons and not malignant_reasons:
+                st.info("No strong benign or malignant indicators found. Further evaluation may be needed.")
+
+# Column 3 placeholder
 with col3:
     st.header("Final Conclusion")
 
