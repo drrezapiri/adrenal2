@@ -264,3 +264,35 @@ with col3:
 
     if final_conclusion:
         st.success(final_conclusion)
+
+    # Add export to CSV functionality
+    if final_conclusion:
+        export_data = {
+            "Age": [age],
+            "Mass Size (mm)": [mass_size],
+            "History of Cancer": [history_cancer],
+            "Reason of Referral": [reason_referral],
+            "Non-contrast CT Used": [use_nc_ct],
+            "Contrast Enhanced CT Used": [use_ce_ct],
+            "Non-contrast HU": [non_contrast_hu],
+            "Venous phase HU": [venous_phase_hu],
+            "Delayed HU": [delayed_hu],
+            "Mass Development": [mass_dev],
+            "Bilateral Finding": [bilateral],
+            "Heterogenicity": [heterogenicity],
+            "Macroscopic Fat": [macro_fat],
+            "Cystic": [cystic],
+            "Calcification": [calcification],
+            "Final Conclusion": [final_conclusion]
+        }
+
+        df_export = pd.DataFrame(export_data)
+
+        csv = df_export.to_csv(index=False).encode('utf-8')
+
+        st.download_button(
+            label="Save Final Report as CSV",
+            data=csv,
+            file_name='adrenal_mass_report.csv',
+            mime='text/csv',
+        )
