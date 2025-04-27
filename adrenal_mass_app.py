@@ -239,34 +239,25 @@ with col3:
             size_value = non_contrast_val = venous_val = delayed_val = age_val = None
 
         # Immediate small caption rule
+        caption_displayed = False
         if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
             st.success("Benign")
+            caption_displayed = True
         elif ((non_contrast_val is not None and non_contrast_val < 20) or (venous_val is not None and venous_val < 20)) and (size_value is not None and size_value < 20):
             st.success("Probably benign")
+            caption_displayed = True
         elif ((non_contrast_val is not None and non_contrast_val < 40) or (venous_val is not None and venous_val < 40)) and (size_value is not None and size_value < 40):
             st.error("Possibly malignant")
+            caption_displayed = True
         elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
             st.error("Probably malignant")
-        else:
-            # New check for mandatory fields
+            caption_displayed = True
+
+        if not caption_displayed:
             if (age_val is None) or (size_value is None) or (non_contrast_val is None and venous_val is None):
                 final_conclusion = ""
-        else:
-            abs_washout = rel_washout = None
-            if venous_val is not None and delayed_val is not None and non_contrast_val is not None:
-                try:
-                    abs_washout = ((venous_val - delayed_val) / (venous_val - non_contrast_val)) * 100
-                    rel_washout = ((venous_val - delayed_val) / venous_val) * 100
-                except ZeroDivisionError:
-                    abs_washout = rel_washout = None
-
-            no_enhancement = False
-            if non_contrast_val is not None and venous_val is not None:
-                if venous_val - non_contrast_val < 10:
-                    no_enhancement = True
-
-            malignant_present = False
-            selected_malignant = "malignant findings"
+            else:
+                pass
 
         # Final Conclusion New Correct Rules
 
