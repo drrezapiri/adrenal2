@@ -23,7 +23,7 @@ with col1:
 
     reason_referral = st.selectbox(
         "Reason of referral",
-        ["", "Cancer work-up", "Hormonal imbalance", "Incidentaloma"]
+        ["Cancer work-up", "Hormonal imbalance", "Incidentaloma"]
     )
 
     st.markdown("---")
