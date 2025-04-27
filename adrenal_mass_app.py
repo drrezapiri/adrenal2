@@ -236,8 +236,8 @@ with col3:
             delayed_val = float(delayed_hu) if delayed_hu else None
         except:
             size_value = non_contrast_val = venous_val = delayed_val = None
-
-         if (age_val is None) or (size_value is None) or (non_contrast_val is None and venous_val is None):
+            
+        if (age_val is None) or (size_value is None) or (non_contrast_val is None and venous_val is None):
             final_conclusion = ""
         else:
             abs_washout = rel_washout = None
