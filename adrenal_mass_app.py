@@ -278,7 +278,7 @@ with col3:
 
         elif size_value is not None and 10 <= size_value <= 40 and mass_dev in ["Increased >5 mm/year", "In doubt"]:
             if not history_cancer:
-                final_conclusion = "Approach C recommended. Consider biochemical assays and adrenal CT."
+                final_conclusion = "Resection recommended. Consider biochemical assays and adrenal CT."
             else:
                 final_conclusion = "Consider biopsy or PET-CT, including biochemical assays."
 
