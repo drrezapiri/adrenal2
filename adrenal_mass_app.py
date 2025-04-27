@@ -44,7 +44,7 @@ with col1:
 
     mass_dev = st.selectbox(
         "Mass development",
-        ["", "No prior scanning", "Increased >5 mm/year", "Increased <5 mm/year", "In doubt"]
+        ["No prior scanning", "Increased >5 mm/year", "Increased <5 mm/year", "In doubt"]
     )
 
     bilateral = st.checkbox("Bilateral finding")
