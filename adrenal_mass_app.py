@@ -234,12 +234,24 @@ with col3:
             non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
             venous_val = float(venous_phase_hu) if venous_phase_hu else None
             delayed_val = float(delayed_hu) if delayed_hu else None
+            age_val = int(age) if age else None
         except:
-            size_value = non_contrast_val = venous_val = delayed_val = None
-            
-        if (age_val is None) or (size_value is None) or (non_contrast_val is None and venous_val is None):
-            final_conclusion = ""
+            size_value = non_contrast_val = venous_val = delayed_val = age_val = None
+
+        # Immediate small caption rule
+        if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
+            st.success("Benign")
+        elif ((non_contrast_val is not None and non_contrast_val < 20) or (venous_val is not None and venous_val < 20)) and (size_value is not None and size_value < 20):
+            st.success("Probably benign")
+        elif ((non_contrast_val is not None and non_contrast_val < 40) or (venous_val is not None and venous_val < 40)) and (size_value is not None and size_value < 40):
+            st.error("Possibly malignant")
+        elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
+            st.error("Probably malignant")
         else:
+            # New check for mandatory fields
+            if (age_val is None) or (size_value is None) or (non_contrast_val is None and venous_val is None):
+                final_conclusion = ""
+            else:
             abs_washout = rel_washout = None
             if venous_val is not None and delayed_val is not None and non_contrast_val is not None:
                 try:
