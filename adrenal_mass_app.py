@@ -241,6 +241,17 @@ with col3:
         if (age_val is None) or (size_value is None) or (non_contrast_val is None and venous_val is None):
             final_conclusion = ""
         else:
+                # Always show small caption after final conclusion
+    if assess_button:
+        if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
+            st.success("Benign")
+        elif ((non_contrast_val is not None and non_contrast_val < 20) or (venous_val is not None and venous_val < 20)) and (size_value is not None and size_value < 20):
+            st.success("Probably benign")
+        elif ((non_contrast_val is not None and non_contrast_val < 40) or (venous_val is not None and venous_val < 40)) and (size_value is not None and size_value < 40):
+            st.error("Possibly malignant")
+        elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
+            st.error("Probably malignant")
+
             abs_washout = rel_washout = None
             if venous_val is not None and delayed_val is not None and non_contrast_val is not None:
                 try:
@@ -254,64 +265,64 @@ with col3:
                 if venous_val - non_contrast_val < 10:
                     no_enhancement = True
 
-            if macro_fat:
-                final_conclusion = "The mass is probably a Myelolipoma. No follow-up needed."
-            elif no_enhancement and venous_val and venous_val > 20 and non_contrast_val is not None:
-                final_conclusion = "There is a hematoma enhancement pattern. No follow-up needed."
-            elif (non_contrast_val is not None and non_contrast_val <= 10) or (venous_val is not None and venous_val <= 10):
-                final_conclusion = "Due to low attenuation, no follow-up needed."
-            elif calcification:
-                final_conclusion = "Calcification of the mass is a benign sign. No follow-up needed."
-            elif size_value is not None and size_value <= 10:
-                final_conclusion = "Due to small size, no follow-up needed."
-            elif size_value is not None and 10 < size_value <= 20 and mass_dev == "No prior scanning" and not history_cancer:
-                final_conclusion = "Probably benign, but consider biochemical assays and adrenal CT scanning after 12 months."
-            elif size_value is not None and 10 <= size_value <= 40 and mass_dev == "Increased <5 mm/year":
-                final_conclusion = "Probably benign. No follow-up needed."
-            elif size_value is not None and 10 <= size_value <= 40 and mass_dev in ["Increased >5 mm/year", "In doubt"]:
-                if not history_cancer:
-                    final_conclusion = "Resection recommended. Consider biochemical assays and adrenal CT."
-                else:
-                    final_conclusion = "Consider biopsy or PET-CT, including biochemical assays."
-            elif size_value is not None and 20 < size_value < 40 and mass_dev == "No prior scanning" and not history_cancer:
-                if (non_contrast_val is None or venous_val is None or delayed_val is None):
-                    final_conclusion = "Consider Adrenal CT."
-                else:
-                    if no_enhancement or (non_contrast_val is not None and non_contrast_val <= 10):
-                        final_conclusion = "Probably benign. No follow-up needed."
-                    elif abs_washout is not None and rel_washout is not None:
-                        if abs_washout > 60 and rel_washout > 40:
-                            final_conclusion = "Probably benign. No follow-up needed. Biochemical assays may be considered."
-                        else:
-                            final_conclusion = "Depending on the clinical scenario, control with adrenal CT, biopsy, PET-CT or resection should be considered, along with biochemical assays."
-            elif size_value is not None and 20 < size_value < 40 and mass_dev == "No prior scanning" and history_cancer:
-                if (non_contrast_val is None or venous_val is None or delayed_val is None):
-                    final_conclusion = "Consider Adrenal CT."
-                else:
-                    if no_enhancement or (non_contrast_val is not None and non_contrast_val <= 10):
-                        final_conclusion = "Probably benign. No follow-up needed."
-                    elif abs_washout is not None and rel_washout is not None:
-                        if abs_washout > 60 and rel_washout > 40:
-                            final_conclusion = "Probably benign. No follow-up needed. Biochemical assays may be considered."
-                        else:
-                            final_conclusion = "Depending on the clinical scenario, control with adrenal CT, biopsy, PET-CT or resection should be considered, along with biochemical assays."
-            elif size_value is not None and size_value >= 40:
-                if history_cancer:
-                    final_conclusion = "Consider biopsy or PET-CT, also consider biochemical assays."
-                else:
-                    final_conclusion = "Consider surgical resection and biochemical assays."
+  if macro_fat:
+            final_conclusion = "The mass is probably a Myelolipoma. No follow-up needed."
+
+        elif no_enhancement and venous_val and venous_val > 20 and non_contrast_val is not None:
+            final_conclusion = "There is a hematoma enhancement pattern. No follow-up needed."
+
+        elif (non_contrast_val is not None and non_contrast_val <= 10) or (venous_val is not None and venous_val <= 10):
+            final_conclusion = "Due to low attenuation, no follow-up needed."
+
+        elif calcification:
+            final_conclusion = "Calcification of the mass is a benign sign. No follow-up needed."
+
+        elif size_value is not None and size_value <= 10:
+            final_conclusion = "Due to small size, no follow-up needed."
+
+        elif size_value is not None and 10 <= size_value <= 20 and mass_dev == "No prior scanning" and not history_cancer:
+            final_conclusion = "Probably benign, but consider biochemical assays and adrenal CT scanning after 12 months."
+
+        elif size_value is not None and 10 <= size_value <= 40 and mass_dev == "Increased <5 mm/year":
+            final_conclusion = "Probably benign. No follow-up needed."
+
+        elif size_value is not None and 10 <= size_value <= 40 and mass_dev in ["Increased >5 mm/year", "In doubt"]:
+            if not history_cancer:
+                final_conclusion = "Resection recommended. Consider biochemical assays and adrenal CT."
+            else:
+                final_conclusion = "Consider biopsy or PET-CT, including biochemical assays."
+
+        elif size_value is not None and 20 < size_value < 40 and mass_dev == "No prior scanning" and not history_cancer:
+            if (non_contrast_val is None or venous_val is None or delayed_val is None):
+                final_conclusion = "Consider Adrenal CT."
+            else:
+                if no_enhancement or (non_contrast_val is not None and non_contrast_val <= 10):
+                    final_conclusion = "Probably benign. No follow-up needed."
+                elif abs_washout is not None and rel_washout is not None:
+                    if abs_washout > 60 and rel_washout > 40:
+                        final_conclusion = "Probably benign. No follow-up needed. Biochemical assays may be considered."
+                    else:
+                        final_conclusion = "Depending on the clinical scenario, control with adrenal CT, biopsy, PET-CT or resection should be considered, along with biochemical assays."
+
+        elif size_value is not None and 20 < size_value < 40 and mass_dev == "No prior scanning" and history_cancer:
+            if (non_contrast_val is None or venous_val is None or delayed_val is None):
+                final_conclusion = "Consider Adrenal CT."
+            else:
+                if no_enhancement or (non_contrast_val is not None and non_contrast_val <= 10):
+                    final_conclusion = "Probably benign. No follow-up needed."
+                elif abs_washout is not None and rel_washout is not None:
+                    if abs_washout > 60 and rel_washout > 40:
+                        final_conclusion = "Probably benign. No follow-up needed. Biochemical assays may be considered."
+                    else:
+                        final_conclusion = "Depending on the clinical scenario, control with adrenal CT, biopsy, PET-CT or resection should be considered, along with biochemical assays."
+
+        elif size_value is not None and size_value >= 40:
+            if history_cancer:
+                final_conclusion = "Consider biopsy or PET-CT, also consider biochemical assays."
+            else:
+                final_conclusion = "Consider surgical resection and biochemical assays."
 
     if final_conclusion:
         st.success(final_conclusion)
         st.session_state['final_conclusion'] = final_conclusion
 
-    # Always show small caption after final conclusion
-    if assess_button:
-        if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
-            st.success("Benign")
-        elif ((non_contrast_val is not None and non_contrast_val < 20) or (venous_val is not None and venous_val < 20)) and (size_value is not None and size_value < 20):
-            st.success("Probably benign")
-        elif ((non_contrast_val is not None and non_contrast_val < 40) or (venous_val is not None and venous_val < 40)) and (size_value is not None and size_value < 40):
-            st.error("Possibly malignant")
-        elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
-            st.error("Probably malignant")
