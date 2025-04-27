@@ -251,7 +251,7 @@ with col3:
             # New check for mandatory fields
             if (age_val is None) or (size_value is None) or (non_contrast_val is None and venous_val is None):
                 final_conclusion = ""
-            else:
+        else:
             abs_washout = rel_washout = None
             if venous_val is not None and delayed_val is not None and non_contrast_val is not None:
                 try:
