@@ -237,21 +237,24 @@ with col3:
         except:
             size_value = non_contrast_val = venous_val = delayed_val = None
 
-        abs_washout = rel_washout = None
-        if venous_val is not None and delayed_val is not None and non_contrast_val is not None:
-            try:
-                abs_washout = ((venous_val - delayed_val) / (venous_val - non_contrast_val)) * 100
-                rel_washout = ((venous_val - delayed_val) / venous_val) * 100
-            except ZeroDivisionError:
-                abs_washout = rel_washout = None
+         if (age_val is None) or (size_value is None) or (non_contrast_val is None and venous_val is None):
+            final_conclusion = ""
+        else:
+            abs_washout = rel_washout = None
+            if venous_val is not None and delayed_val is not None and non_contrast_val is not None:
+                try:
+                    abs_washout = ((venous_val - delayed_val) / (venous_val - non_contrast_val)) * 100
+                    rel_washout = ((venous_val - delayed_val) / venous_val) * 100
+                except ZeroDivisionError:
+                    abs_washout = rel_washout = None
 
-        no_enhancement = False
-        if non_contrast_val is not None and venous_val is not None:
-            if venous_val - non_contrast_val < 10:
-                no_enhancement = True
+            no_enhancement = False
+            if non_contrast_val is not None and venous_val is not None:
+                if venous_val - non_contrast_val < 10:
+                    no_enhancement = True
 
-        malignant_present = False
-        selected_malignant = "malignant findings"
+            malignant_present = False
+            selected_malignant = "malignant findings"
 
         # Final Conclusion New Correct Rules
 
