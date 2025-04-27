@@ -35,7 +35,6 @@ with col1:
 
     if use_nc_ct:
         non_contrast_hu = st.text_input("Non-contrast HU")
-
     if use_ce_ct:
         venous_phase_hu = st.text_input("Venous phase HU")
         delayed_hu = st.text_input("Delayed HU")
@@ -57,6 +56,34 @@ with col1:
     st.markdown("---")
     assess_button = st.button("Assess")
 
+    if 'final_conclusion' in st.session_state and st.session_state['final_conclusion']:
+        df_export = pd.DataFrame({
+            "Age": [age],
+            "Mass Size (mm)": [mass_size],
+            "History of Cancer": [history_cancer],
+            "Reason of Referral": [reason_referral],
+            "Non-contrast CT Used": [use_nc_ct],
+            "Contrast Enhanced CT Used": [use_ce_ct],
+            "Non-contrast HU": [non_contrast_hu],
+            "Venous phase HU": [venous_phase_hu],
+            "Delayed HU": [delayed_hu],
+            "Mass Development": [mass_dev],
+            "Bilateral Finding": [bilateral],
+            "Heterogenicity": [heterogenicity],
+            "Macroscopic Fat": [macro_fat],
+            "Cystic": [cystic],
+            "Calcification": [calcification],
+            "Final Conclusion": [st.session_state['final_conclusion']]
+        })
+
+        csv = df_export.to_csv(index=False).encode('utf-8')
+
+        st.download_button(
+            label="Save Final Report as CSV",
+            data=csv,
+            file_name='adrenal_mass_report.csv',
+            mime='text/csv',
+        )
 # Column 2: Diagnostic Interpretation
 with col2:
     st.header("Preliminary Interpretation")
@@ -202,97 +229,93 @@ with col3:
     final_conclusion = ""
 
     if assess_button:
-        malignant_present = len(malignant_reasons) > 0
-        selected_malignant = ", ".join(malignant_reasons)
+        try:
+            size_value = float(mass_size) if mass_size else None
+            non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
+            venous_val = float(venous_phase_hu) if venous_phase_hu else None
+            delayed_val = float(delayed_hu) if delayed_hu else None
+        except:
+            size_value = non_contrast_val = venous_val = delayed_val = None
+
+        abs_washout = rel_washout = None
+        if venous_val is not None and delayed_val is not None and non_contrast_val is not None:
+            try:
+                abs_washout = ((venous_val - delayed_val) / (venous_val - non_contrast_val)) * 100
+                rel_washout = ((venous_val - delayed_val) / venous_val) * 100
+            except ZeroDivisionError:
+                abs_washout = rel_washout = None
+
+        no_enhancement = False
+        if non_contrast_val is not None and venous_val is not None:
+            if venous_val - non_contrast_val < 10:
+                no_enhancement = True
+
+        malignant_present = False
+        selected_malignant = "malignant findings"
 
         if macro_fat:
-            if malignant_present:
-                final_conclusion = f"Findings are consistent with a myelolipoma; however, due to malignant features ({selected_malignant}), control of the mass with adrenal CT is recommended."
-            else:
-                final_conclusion = "Findings are consistent with a myelolipoma. No follow-up needed."
+            final_conclusion = "The mass is probably a Myelolipoma. No follow-up needed."
 
-        elif (non_contrast_val is not None and venous_val is not None) and (venous_val - non_contrast_val < 10) and venous_val > 20:
-            if malignant_present:
-                final_conclusion = f"Enhancement pattern suggests hematoma, but due to malignant features ({selected_malignant}), control of the mass with adrenal CT is recommended."
-            else:
-                final_conclusion = "Enhancement pattern suggests hematoma. No follow-up needed."
+        elif no_enhancement and venous_val and venous_val > 20 and non_contrast_val is not None:
+            final_conclusion = "There is a hematoma enhancement pattern. No follow-up needed."
 
         elif (non_contrast_val is not None and non_contrast_val <= 10) or (venous_val is not None and venous_val <= 10):
             if malignant_present:
-                final_conclusion = f"Low attenuation suggests a benign lesion; however, malignant features ({selected_malignant}) are present. Biochemical assays are recommended."
+                final_conclusion = f"Due to low attenuation, no follow-up needed. However, {selected_malignant} present; consider biochemical assays."
             else:
-                final_conclusion = "Low attenuation suggests a benign lesion. No follow-up needed."
+                final_conclusion = "Due to low attenuation, no follow-up needed."
 
         elif calcification:
             if malignant_present:
-                final_conclusion = f"Calcifications are benign indicators; however, due to malignant features ({selected_malignant}), control of the mass with adrenal CT is recommended and biochemical assays should be performed."
+                final_conclusion = f"Calcification suggests benignity, but {selected_malignant} present; control with adrenal CT and biochemical assays advised."
             else:
-                final_conclusion = "Calcifications suggest a benign lesion. No follow-up needed."
+                final_conclusion = "Calcification of the mass is a benign sign. No follow-up needed."
 
-        elif size_value is not None and 10 <= size_value <= 40:
-            if mass_dev == "Increased <5 mm/year":
-                if malignant_present:
-                    final_conclusion = f"Stable size supports a benign diagnosis; however, malignant features ({selected_malignant}) are present. Biochemical assays are recommended."
-                else:
-                    final_conclusion = "Stable size supports a benign diagnosis. No follow-up needed. In case of clinical suspicion, biochemical assays may be considered."
-            elif mass_dev == "Increased >5 mm/year" or mass_dev == "In doubt":
-                if history_cancer:
-                    final_conclusion = "Due to growth and history of cancer, biopsy or PET-CT evaluation along with biochemical assays is recommended."
-                else:
-                    final_conclusion = "Due to growth without history of cancer, control with adrenal CT or resection should be considered. Biochemical assays may also be indicated."
+        elif size_value is not None and size_value <= 10:
+            if malignant_present:
+                final_conclusion = f"Due to small size, no follow-up needed. However, {selected_malignant} present; consider biochemical assays."
+            else:
+                final_conclusion = "Due to small size, no follow-up needed."
 
-        elif size_value is not None and 10 <= size_value <= 40 and not history_cancer and mass_dev == "No prior scanning":
-            if size_value < 20:
-                final_conclusion = "Probably benign lesion based on small size. Biochemical assays to determine functional status may be considered."
-            elif (size_value >= 20 and size_value <= 40):
-                if (non_contrast_val is None or venous_val is None or delayed_val is None):
-                    final_conclusion = "Incomplete imaging characterization. Recommend adrenal CT follow-up at 12 months."
+        elif size_value is not None and 10 <= size_value <= 20 and mass_dev == "No prior scanning" and not history_cancer:
+            final_conclusion = "Probably benign, but consider biochemical assays and adrenal CT scanning after 12 months."
+
+        elif size_value is not None and 10 <= size_value <= 40 and mass_dev == "Increased <5 mm/year":
+            if malignant_present:
+                final_conclusion = f"Probably benign but {selected_malignant} present; biochemical assays recommended."
+            else:
+                final_conclusion = "Probably benign. No follow-up needed. In case of suspicion, biochemical assays can be considered."
+
+        elif size_value is not None and 10 <= size_value <= 40 and mass_dev in ["Increased >5 mm/year", "In doubt"]:
+            if not history_cancer:
+                if (non_contrast_val is not None and venous_val is not None and delayed_val is not None):
+                    if abs_washout is not None and rel_washout is not None and (abs_washout < 60 or rel_washout < 40):
+                        final_conclusion = "Washout suboptimal. Depending on clinical scenario control with adrenal CT, biopsy, PET-CT, or resection should be considered along with biochemical assays."
+                    else:
+                        final_conclusion = "Approach C recommended. Consider biochemical assays and adrenal CT."
                 else:
-                    if venous_val - non_contrast_val < 10:
-                        final_conclusion = "Imaging characteristics suggest a benign lesion. No follow-up needed."
-                    elif abs_washout is not None and rel_washout is not None:
-                        if abs_washout > 60 and rel_washout > 40:
-                            final_conclusion = "High washout values suggest a benign lesion. No follow-up needed. Biochemical assays may be considered."
-                        else:
-                            final_conclusion = "Suboptimal washout characteristics. Depending on clinical context, control with adrenal CT, biopsy, PET-CT, or resection should be considered. Biochemical assays are recommended."
+                    final_conclusion = "Approach C recommended. Consider biochemical assays and adrenal CT."
+            else:
+                final_conclusion = "History of cancer. Recommend biopsy or PET-CT and biochemical assays."
+
+        elif size_value is not None and 20 < size_value < 40 and mass_dev == "No prior scanning" and not history_cancer:
+            if (non_contrast_val is None or venous_val is None or delayed_val is None):
+                final_conclusion = "Consider adrenal CT follow-up."
+            else:
+                if no_enhancement or (non_contrast_val is not None and non_contrast_val <= 10):
+                    final_conclusion = "Probably benign. No follow-up needed."
+                elif abs_washout is not None and rel_washout is not None:
+                    if abs_washout > 60 and rel_washout > 40:
+                        final_conclusion = "High washout values suggest benign lesion. No follow-up needed. Biochemical assays may be considered."
+                    else:
+                        final_conclusion = "Washout characteristics suboptimal. Control or biopsy/PET-CT should be considered along with biochemical assays."
 
         elif size_value is not None and size_value >= 40:
             if history_cancer:
-                final_conclusion = "Large mass in patient with cancer history. Biopsy or PET-CT and biochemical assays are recommended."
+                final_conclusion = "Large adrenal mass with cancer history. Recommend biopsy or PET-CT and biochemical assays."
             else:
-                final_conclusion = "Large mass without cancer history. Surgical resection and biochemical assays are recommended."
+                final_conclusion = "Large adrenal mass. Recommend surgical resection and biochemical assays."
 
-    if final_conclusion:
-        st.success(final_conclusion)
-
-    # Add export to CSV functionality
-    if final_conclusion:
-        export_data = {
-            "Age": [age],
-            "Mass Size (mm)": [mass_size],
-            "History of Cancer": [history_cancer],
-            "Reason of Referral": [reason_referral],
-            "Non-contrast CT Used": [use_nc_ct],
-            "Contrast Enhanced CT Used": [use_ce_ct],
-            "Non-contrast HU": [non_contrast_hu],
-            "Venous phase HU": [venous_phase_hu],
-            "Delayed HU": [delayed_hu],
-            "Mass Development": [mass_dev],
-            "Bilateral Finding": [bilateral],
-            "Heterogenicity": [heterogenicity],
-            "Macroscopic Fat": [macro_fat],
-            "Cystic": [cystic],
-            "Calcification": [calcification],
-            "Final Conclusion": [final_conclusion]
-        }
-
-        df_export = pd.DataFrame(export_data)
-
-        csv = df_export.to_csv(index=False).encode('utf-8')
-
-        st.download_button(
-            label="Save Final Report as CSV",
-            data=csv,
-            file_name='adrenal_mass_report.csv',
-            mime='text/csv',
-        )
+        if final_conclusion:
+            st.success(final_conclusion)
+            st.session_state['final_conclusion'] = final_conclusion
