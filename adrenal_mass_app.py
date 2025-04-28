@@ -9,7 +9,7 @@ st.set_page_config(
 
 # Title and credits
 st.title("Adrenal Mass Approach")
-st.caption("Credits: Peter Sommer Ulriksen and Reza Piri from Radiology Department in Rigshospitalet")
+st.caption("This app was developed by Peter Sommer Ulriksen and Reza Piri from Radiology Department in Rigshospitalet")
 
 # Create three columns
 col1, col2, col3 = st.columns(3)
