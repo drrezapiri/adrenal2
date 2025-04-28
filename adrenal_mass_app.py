@@ -50,19 +50,24 @@ with col1:
         "Mass development",
         ["No prior scanning", "Increased >5 mm/year", "Increased <5 mm/year", "In doubt"]
     )
-
     bilateral = st.checkbox("Bilateral finding")
     heterogenicity = st.selectbox("Heterogenicity", ["", "Homogen", "Heterogen"])
-       # Macroscopic fat detection based on HU values
-    macro_fat_default = False
-    macro_fat_disabled = False
+
+    # Macroscopic fat detection based on HU values
+    macro_fat_forced = False
     try:
         if (use_nc_ct and non_contrast_hu and float(non_contrast_hu) < 0) or (use_ce_ct and venous_phase_hu and float(venous_phase_hu) < 0):
-            macro_fat_default = True
-            macro_fat_disabled = True
+            macro_fat_forced = True
     except ValueError:
         pass
-    macro_fat = st.checkbox("Sign of macroscopic fat")
+
+    if macro_fat_forced:
+        macro_fat = True
+        st.checkbox("Sign of macroscopic fat", value=True, disabled=True)
+        st.caption("Detected negative HU value → macroscopic fat automatically set.")
+    else:
+        macro_fat = st.checkbox("Sign of macroscopic fat")
+
     cystic = st.checkbox("Cystic")
     calcification = st.checkbox("Calcification")
 
@@ -70,6 +75,7 @@ with col1:
     assess_button = st.button("Assess")
 
     if 'final_conclusion' in st.session_state and st.session_state['final_conclusion']:
+        import pandas as pd
         df_export = pd.DataFrame({
             "Age": [age],
             "Mass Size (mm)": [mass_size],
@@ -90,7 +96,6 @@ with col1:
         })
 
         csv = df_export.to_csv(index=False).encode('utf-8')
-
         st.download_button(
             label="Save Final Report as CSV",
             data=csv,
