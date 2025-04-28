@@ -15,7 +15,7 @@ if st.session_state['reset']:
             del st.session_state[key]
     st.session_state['reset'] = False
     st.experimental_rerun()
-
+    
 st.set_page_config(
     page_title="Adrenal Mass Approach",
     page_icon="🩺",
@@ -115,6 +115,8 @@ with col1:
         file_name='adrenal_mass_report.csv',
         mime='text/csv',
     )
+if st.button("Reset All Fields"):
+    st.session_state['reset'] = True
 
 
 # Column 2: Diagnostic Interpretation
