@@ -297,7 +297,7 @@ with col3:
         elif calcification:
             final_conclusion = "Calcification of the mass is a benign sign. No follow-up needed."
             if malignant_signs:
-                final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, approach B and consider biochemical assays to determine functional status."
+                final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, Mass control with adrenal CT and consider biochemical assays to determine functional status."
         elif size_value is not None and size_value <= 10:
             final_conclusion = "Due to small size, no follow-up needed."
             if malignant_signs:
