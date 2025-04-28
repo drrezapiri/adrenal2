@@ -53,6 +53,15 @@ with col1:
 
     bilateral = st.checkbox("Bilateral finding")
     heterogenicity = st.selectbox("Heterogenicity", ["", "Homogen", "Heterogen"])
+       # Macroscopic fat detection based on HU values
+    macro_fat_default = False
+    macro_fat_disabled = False
+    try:
+        if (use_nc_ct and non_contrast_hu and float(non_contrast_hu) < 0) or (use_ce_ct and venous_phase_hu and float(venous_phase_hu) < 0):
+            macro_fat_default = True
+            macro_fat_disabled = True
+    except ValueError:
+        pass
     macro_fat = st.checkbox("Sign of macroscopic fat")
     cystic = st.checkbox("Cystic")
     calcification = st.checkbox("Calcification")
