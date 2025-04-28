@@ -300,7 +300,12 @@ with col3:
             st.markdown("<p style='color:red;'>Probably malignant</p>", unsafe_allow_html=True)
 
         # Final Conclusion full rules
-        if macro_fat:
+	if size_value is not None and size_value >= 40:
+            if history_cancer:
+                final_conclusion = "Consider biopsy or PET-CT, also consider biochemical assays."
+            else:
+                final_conclusion = "Consider Resection and biochemical assays."
+        elif macro_fat:
             final_conclusion = "The mass is probably a Myelolipoma. No follow-up needed."
             if malignant_signs:
                 final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, Consider biochemical assays to determine functional status."
@@ -356,11 +361,6 @@ with col3:
                     final_conclusion = "Probably benign. No follow-up needed. Biochemical assays may be considered."
                 else:
                     final_conclusion = "Depending on the clinical scenario, control with adrenal CT, biopsy, PET-CT or resection should be considered, also consider biochemical assays."
-        elif size_value is not None and size_value >= 40:
-            if history_cancer:
-                final_conclusion = "Consider biopsy or PET-CT, also consider biochemical assays."
-            else:
-                final_conclusion = "Consider Resection and biochemical assays."
 
     if final_conclusion:
         st.markdown(f"<p style='color:black;'>{final_conclusion}</p>", unsafe_allow_html=True)
