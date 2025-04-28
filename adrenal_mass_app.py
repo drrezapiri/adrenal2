@@ -1,9 +1,17 @@
+
+
+
+
+
 import streamlit as st
 import pandas as pd
+# Set page configuration
+st.set_page_config(
+    page_title="Adrenal Mass Approach",
+    page_icon="🩺",
+    layout="wide"
+)
 
-# Add reset button BEFORE column layout
-if st.button("Reset Page"):
-    st.experimental_rerun()
 # Title and credits
 st.title("Adrenal Mass Approach")
 st.caption("This app was developed by Peter Sommer Ulriksen and Reza Piri from Radiology Department in Rigshospitalet")
@@ -11,6 +19,7 @@ st.caption("This app was developed by Peter Sommer Ulriksen and Reza Piri from R
 # Create three columns
 col1, col2, col3 = st.columns(3)
 
+# Column 1: Input Data
 with col1:
     st.header("Input Data")
     age = st.text_input("Age")
@@ -67,6 +76,7 @@ with col1:
     st.markdown("---")
     assess_button = st.button("Assess")
 
+    import pandas as pd
     df_export = pd.DataFrame({
         "Age": [age],
         "Mass Size (mm)": [mass_size],
@@ -96,7 +106,6 @@ with col1:
         mime='text/csv',
     )
 
-    
 
 # Column 2: Diagnostic Interpretation
 with col2:
