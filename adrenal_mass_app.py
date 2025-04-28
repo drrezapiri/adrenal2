@@ -300,7 +300,7 @@ with col3:
             st.markdown("<p style='color:red;'>Probably malignant</p>", unsafe_allow_html=True)
 
         # Final Conclusion full rules
-if size_value is not None and size_value >= 40:
+    if size_value is not None and size_value >= 40:
             if history_cancer:
                 final_conclusion = "Consider biopsy or PET-CT, also consider biochemical assays."
             else:
