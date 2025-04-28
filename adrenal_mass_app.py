@@ -70,6 +70,7 @@ with col1:
 
     cystic = st.checkbox("Cystic")
     calcification = st.checkbox("Calcification")
+    additional_comments = st.text_area("Additional Comments")
 
     st.markdown("---")
     assess_button = st.button("Assess")
@@ -92,8 +93,9 @@ with col1:
             "Macroscopic Fat": [macro_fat],
             "Cystic": [cystic],
             "Calcification": [calcification],
-            "Final Conclusion": [st.session_state['final_conclusion']]
-        })
+            "Final Conclusion": [st.session_state['final_conclusion']],
+            "Additional Comments": [additional_comments]
+              })
 
         csv = df_export.to_csv(index=False).encode('utf-8')
         st.download_button(
