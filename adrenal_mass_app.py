@@ -353,7 +353,7 @@ with col3:
                     final_conclusion = "Probably benign, No follow-up needed, but biochemical assays to determine functional status can be considered."
                 else:
                     final_conclusion = "Depending on the clinical scenario, control with adrenal CT, biopsy, PET-CT or resection should be considered, also consider biochemical assays."
-        elif size_value is not None and 20 < size_value < 40 and mass_dev == "No prior scanning" and history_cancer:
+        elif size_value is not None and 10 < size_value < 40 and mass_dev == "No prior scanning" and history_cancer:
             if non_contrast_val is None or venous_val is None or delayed_val is None:
                 final_conclusion = "Consider Adrenal CT."
             else:
