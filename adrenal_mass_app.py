@@ -328,6 +328,6 @@ with col3:
                     final_conclusion = "Consider surgical resection and biochemical assays."
                     
     if final_conclusion:
-    st.markdown(f"<p style='color:black;'>{final_conclusion}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='color:black;'>{final_conclusion}</p>", unsafe_allow_html=True)
         st.session_state['final_conclusion'] = final_conclusion
 
