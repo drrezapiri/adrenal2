@@ -243,15 +243,15 @@ with col3:
         else:
             # Immediate small caption rule BEFORE final conclusion
             if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
-                st.markdown("<p style='color:green;'>Benign</p>", unsafe_allow_html=True)
+                st.success("Benign")
             elif ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) or (size_value is not None and size_value < 10):
-                st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
+                st.success("Probably Benign")
             elif ((non_contrast_val is not None and non_contrast_val < 20) or (venous_val is not None and venous_val < 20)) and (size_value is not None and size_value < 20):
-                st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
+                st.success("Probably benign")
             elif ((non_contrast_val is not None and non_contrast_val < 40) or (venous_val is not None and venous_val < 40)) and (size_value is not None and size_value < 40):
-                st.markdown("<p style='color:red;'>Possibly malignant</p>", unsafe_allow_html=True)
+                st.error("Possibly malignant")
             elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
-                st.markdown("<p style='color:red;'>Probably malignant</p>", unsafe_allow_html=True)
+                st.error("Probably malignant")
 
             # Now start final conclusion rules
             abs_washout = rel_washout = None
@@ -327,8 +327,6 @@ with col3:
                 else:
                     final_conclusion = "Consider surgical resection and biochemical assays."
 
-    if final_conclusion:
-        st.success(final_conclusion)
+ if final_conclusion:
+    st.markdown(f"<p style='color:black;'>{final_conclusion}</p>", unsafe_allow_html=True)
         st.session_state['final_conclusion'] = final_conclusion
-
-
