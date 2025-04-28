@@ -5,6 +5,17 @@
 import streamlit as st
 import pandas as pd
 # Set page configuration
+
+if 'reset' not in st.session_state:
+    st.session_state['reset'] = False
+
+if st.session_state['reset']:
+    for key in list(st.session_state.keys()):
+        if key != 'reset':
+            del st.session_state[key]
+    st.session_state['reset'] = False
+    st.experimental_rerun()
+
 st.set_page_config(
     page_title="Adrenal Mass Approach",
     page_icon="🩺",
@@ -104,10 +115,7 @@ with col1:
         file_name='adrenal_mass_report.csv',
         mime='text/csv',
     )
-if st.button("Reset All Fields"):
-    for key in st.session_state.keys():
-        del st.session_state[key]
-    st.experimental_rerun()
+
 
 # Column 2: Diagnostic Interpretation
 with col2:
