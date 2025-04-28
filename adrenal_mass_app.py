@@ -1,16 +1,25 @@
+
+
+
+
+
 import streamlit as st
 import pandas as pd
+# Set page configuration
+st.set_page_config(
+    page_title="Adrenal Mass Approach",
+    page_icon="🩺",
+    layout="wide"
+)
 
-if 'reset' not in st.session_state:
-    st.session_state['reset'] = False
+# Title and credits
+st.title("Adrenal Mass Approach")
+st.caption("This app was developed by Peter Sommer Ulriksen and Reza Piri from Radiology Department in Rigshospitalet")
 
-if st.session_state['reset']:
-    for key in list(st.session_state.keys()):
-        if key != 'reset':
-            del st.session_state[key]
-    st.session_state['reset'] = False
-    st.experimental_rerun()
+# Create three columns
+col1, col2, col3 = st.columns(3)
 
+# Column 1: Input Data
 with col1:
     st.header("Input Data")
     age = st.text_input("Age")
@@ -67,6 +76,7 @@ with col1:
     st.markdown("---")
     assess_button = st.button("Assess")
 
+    import pandas as pd
     df_export = pd.DataFrame({
         "Age": [age],
         "Mass Size (mm)": [mass_size],
@@ -95,10 +105,9 @@ with col1:
         file_name='adrenal_mass_report.csv',
         mime='text/csv',
     )
-
     st.markdown("---")
-    if st.button("Reset All Fields"):
-        st.session_state['reset'] = True
+    if st.button("Reset"):
+        st.experimental_rerun()
 
 # Column 2: Diagnostic Interpretation
 with col2:
