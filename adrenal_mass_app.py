@@ -104,10 +104,11 @@ with col1:
         file_name='adrenal_mass_report.csv',
         mime='text/csv',
     )
-    st.markdown("---")
-    reset_button = st.button("Reset All Fields")
-    if reset_button:
-        st.experimental_rerun()
+if st.button("Reset All Fields"):
+    for key in st.session_state.keys():
+        del st.session_state[key]
+    st.experimental_rerun()
+
 # Column 2: Diagnostic Interpretation
 with col2:
     st.header("Preliminary Interpretation")
