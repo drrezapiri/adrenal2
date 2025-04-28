@@ -289,21 +289,19 @@ with col3:
         if macro_fat:
             final_conclusion = "The mass is probably a Myelolipoma. No follow-up needed."
             if malignant_signs:
-                final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, consider biochemical assays to determine functional status."
-        elif calcification:            
+                final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, Consider biochemical assays to determine functional status."
         elif non_contrast_val is not None and venous_val is not None and (venous_val - non_contrast_val < 10) and venous_val > 20:
             final_conclusion = "There is a hematoma enhancement pattern. No follow-up needed."
             if malignant_signs:
-                final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, consider biochemical assays to determine functional status."
-        elif calcification:
+                final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, Consider biochemical assays to determine functional status."
         elif (non_contrast_val is not None and non_contrast_val <= 10) or (venous_val is not None and venous_val <= 10):
             final_conclusion = "Due to low attenuation, no follow-up needed."
             if malignant_signs:
-                final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, consider biochemical assays to determine functional status."
+                final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, Consider biochemical assays to determine functional status."
         elif calcification:
             final_conclusion = "Calcification of the mass is a benign sign. No follow-up needed."
             if malignant_signs:
-                final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, Mass control with adrenal CT and consider biochemical assays to determine functional status."
+                final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, Consider biochemical assays to determine functional status."
         elif size_value is not None and size_value <= 10:
             final_conclusion = "Due to small size, no follow-up needed."
             if malignant_signs:
