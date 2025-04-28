@@ -53,7 +53,6 @@ with col1:
     bilateral = st.checkbox("Bilateral finding")
     heterogenicity = st.selectbox("Heterogenicity", ["", "Homogen", "Heterogen"])
 
-    # Macroscopic fat detection based on HU values
     macro_fat_forced = False
     try:
         if (use_nc_ct and non_contrast_hu and float(non_contrast_hu) < 0) or (use_ce_ct and venous_phase_hu and float(venous_phase_hu) < 0):
@@ -70,40 +69,41 @@ with col1:
 
     cystic = st.checkbox("Cystic")
     calcification = st.checkbox("Calcification")
+
     additional_comments = st.text_area("Additional Comments")
 
     st.markdown("---")
     assess_button = st.button("Assess")
 
-    if 'final_conclusion' in st.session_state and st.session_state['final_conclusion']:
-        import pandas as pd
-        df_export = pd.DataFrame({
-            "Age": [age],
-            "Mass Size (mm)": [mass_size],
-            "History of Cancer": [history_cancer],
-            "Reason of Referral": [reason_referral],
-            "Non-contrast CT Used": [use_nc_ct],
-            "Contrast Enhanced CT Used": [use_ce_ct],
-            "Non-contrast HU": [non_contrast_hu],
-            "Venous phase HU": [venous_phase_hu],
-            "Delayed HU": [delayed_hu],
-            "Mass Development": [mass_dev],
-            "Bilateral Finding": [bilateral],
-            "Heterogenicity": [heterogenicity],
-            "Macroscopic Fat": [macro_fat],
-            "Cystic": [cystic],
-            "Calcification": [calcification],
-            "Final Conclusion": [st.session_state['final_conclusion']],
-            "Additional Comments": [additional_comments]
-              })
+    import pandas as pd
+    df_export = pd.DataFrame({
+        "Age": [age],
+        "Mass Size (mm)": [mass_size],
+        "History of Cancer": [history_cancer],
+        "Reason of Referral": [reason_referral],
+        "Non-contrast CT Used": [use_nc_ct],
+        "Contrast Enhanced CT Used": [use_ce_ct],
+        "Non-contrast HU": [non_contrast_hu],
+        "Venous phase HU": [venous_phase_hu],
+        "Delayed HU": [delayed_hu],
+        "Mass Development": [mass_dev],
+        "Bilateral Finding": [bilateral],
+        "Heterogenicity": [heterogenicity],
+        "Macroscopic Fat": [macro_fat],
+        "Cystic": [cystic],
+        "Calcification": [calcification],
+        "Additional Comments": [additional_comments],
+        "Final Conclusion": [st.session_state.get('final_conclusion', "")]
+    })
 
-        csv = df_export.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Save Final Report as CSV",
-            data=csv,
-            file_name='adrenal_mass_report.csv',
-            mime='text/csv',
-        )
+    csv = df_export.to_csv(index=False).encode('utf-8')
+
+    st.download_button(
+        label="Save Report as CSV",
+        data=csv,
+        file_name='adrenal_mass_report.csv',
+        mime='text/csv',
+    )
 # Column 2: Diagnostic Interpretation
 with col2:
     st.header("Preliminary Interpretation")
