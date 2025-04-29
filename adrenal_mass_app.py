@@ -75,6 +75,32 @@ with col1:
 
     st.markdown("---")
     assess_button = st.button("Assess")
+        small_caption_result = ""
+
+    if assess_button:
+        try:
+            size_value = float(mass_size) if mass_size else None
+            non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
+            venous_val = float(venous_phase_hu) if venous_phase_hu else None
+        except:
+            size_value = non_contrast_val = venous_val = None
+
+        if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
+            st.markdown("<p style='color:green;'>Benign</p>", unsafe_allow_html=True)
+            small_caption_result = "Benign"
+        elif ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) or (size_value is not None and size_value < 10):
+            st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
+            small_caption_result = "Probably benign"
+        elif ((non_contrast_val is not None and non_contrast_val < 20) or (venous_val is not None and venous_val < 20)) and (size_value is not None and size_value < 20):
+            st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
+            small_caption_result = "Probably benign"
+        elif ((non_contrast_val is not None and non_contrast_val < 40) or (venous_val is not None and venous_val < 40)) and (size_value is not None and size_value < 40):
+            st.markdown("<p style='color:red;'>Possibly malignant</p>", unsafe_allow_html=True)
+            small_caption_result = "Possibly malignant"
+        elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
+            st.markdown("<p style='color:red;'>Probably malignant</p>", unsafe_allow_html=True)
+            small_caption_result = "Probably malignant"
+
 
     import pandas as pd
 df_export = pd.DataFrame({
@@ -294,31 +320,6 @@ with col3:
                 pass
 
         # Immediate small caption
-    small_caption_result = ""
-
-    if assess_button:
-        try:
-            size_value = float(mass_size) if mass_size else None
-            non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
-            venous_val = float(venous_phase_hu) if venous_phase_hu else None
-        except:
-            size_value = non_contrast_val = venous_val = None
-
-        if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
-            st.markdown("<p style='color:green;'>Benign</p>", unsafe_allow_html=True)
-            small_caption_result = "Benign"
-        elif ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) or (size_value is not None and size_value < 10):
-            st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
-            small_caption_result = "Probably benign"
-        elif ((non_contrast_val is not None and non_contrast_val < 20) or (venous_val is not None and venous_val < 20)) and (size_value is not None and size_value < 20):
-            st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
-            small_caption_result = "Probably benign"
-        elif ((non_contrast_val is not None and non_contrast_val < 40) or (venous_val is not None and venous_val < 40)) and (size_value is not None and size_value < 40):
-            st.markdown("<p style='color:red;'>Possibly malignant</p>", unsafe_allow_html=True)
-            small_caption_result = "Possibly malignant"
-        elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
-            st.markdown("<p style='color:red;'>Probably malignant</p>", unsafe_allow_html=True)
-            small_caption_result = "Probably malignant"
 
 
         # Final Conclusion full rules
