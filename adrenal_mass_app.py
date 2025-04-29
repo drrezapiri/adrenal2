@@ -294,7 +294,15 @@ with col3:
                 pass
 
         # Immediate small caption
-        small_caption_result = ""  # reset it first
+    small_caption_result = ""
+
+    if assess_button:
+        try:
+            size_value = float(mass_size) if mass_size else None
+            non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
+            venous_val = float(venous_phase_hu) if venous_phase_hu else None
+        except:
+            size_value = non_contrast_val = venous_val = None
 
         if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
             st.markdown("<p style='color:green;'>Benign</p>", unsafe_allow_html=True)
