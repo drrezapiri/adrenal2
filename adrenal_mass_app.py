@@ -75,7 +75,7 @@ with col1:
 
     st.markdown("---")
     assess_button = st.button("Assess")
-        small_caption_result = ""
+    small_caption_result = ""
 
     if assess_button:
         try:
