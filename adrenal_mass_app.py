@@ -142,7 +142,7 @@ with col2:
                 benign_reasons.append("HU non-contrast ≤ 10")
             if venous_val is not None and venous_val <= 10:
                 benign_reasons.append("HU venous ≤ 10")
-            if mass_dev == "No prior scanning" or mass_dev == "Increased <5 mm/year":
+            if mass_dev == "Increased <5 mm/year":
                 benign_reasons.append("no significant growth")
             if non_contrast_val is not None and venous_val is not None:
                 if venous_val - non_contrast_val < 10:
