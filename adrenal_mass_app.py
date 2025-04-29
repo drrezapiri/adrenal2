@@ -97,14 +97,14 @@ with col1:
         "Final Conclusion": [st.session_state.get('final_conclusion', "")]
     })
 
-    csv = df_export.to_csv(index=False).encode('utf-8')
+csv = df_export.to_csv(index=False, sep=';', encoding='utf-8-sig').encode('utf-8-sig')
 
-    st.download_button(
-        label="Save Report as CSV",
-        data=csv,
-        file_name='adrenal_mass_report.csv',
-        mime='text/csv',
-    )
+st.download_button(
+    label="Save Report as CSV",
+    data=csv,
+    file_name='adrenal_mass_report.csv',
+    mime='text/csv',
+)
 
 
 # Column 2: Diagnostic Interpretation
