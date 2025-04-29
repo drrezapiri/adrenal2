@@ -320,6 +320,16 @@ with col3:
                 pass
 
         # Immediate small caption
+        if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
+            st.markdown("<p style='color:green;'>Benign</p>", unsafe_allow_html=True)
+        elif ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) or (size_value is not None and size_value < 10):
+            st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
+        elif ((non_contrast_val is not None and non_contrast_val < 20) or (venous_val is not None and venous_val < 20)) and (size_value is not None and size_value < 20):
+            st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
+        elif ((non_contrast_val is not None and non_contrast_val < 40) or (venous_val is not None and venous_val < 40)) and (size_value is not None and size_value < 40):
+            st.markdown("<p style='color:red;'>Possibly malignant</p>", unsafe_allow_html=True)
+        elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
+            st.markdown("<p style='color:red;'>Probably malignant</p>", unsafe_allow_html=True)
 
 
         # Final Conclusion full rules
