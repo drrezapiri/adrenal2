@@ -97,38 +97,6 @@ with col1:
             small_caption_result = "Probably malignant"
 
 
-    import pandas as pd
-df_export = pd.DataFrame({
-    "Age": [age],
-    "Mass Size (mm)": [mass_size],
-    "History of Cancer": [history_cancer],
-    "Reason of Referral": [reason_referral],
-    "Non-contrast CT Used": [use_nc_ct],
-    "Contrast Enhanced CT Used": [use_ce_ct],
-    "Non-contrast HU": [non_contrast_hu],
-    "Venous phase HU": [venous_phase_hu],
-    "Delayed HU": [delayed_hu],
-    "Mass Development": [mass_dev],
-    "Bilateral Finding": [bilateral],
-    "Heterogenicity": [heterogenicity],
-    "Macroscopic Fat": [macro_fat],
-    "Cystic": [cystic],
-    "Calcification": [calcification],
-    "Additional Comments": [additional_comments],
-    "Small Caption Result": [small_caption_result],   # <-- NEW
-    "Final Conclusion": [st.session_state.get('final_conclusion', "")]
-})
-
-csv = df_export.to_csv(index=False, sep=';', encoding='utf-8-sig').encode('utf-8-sig')
-
-st.download_button(
-    label="Save Report as CSV",
-    data=csv,
-    file_name='adrenal_mass_report.csv',
-    mime='text/csv',
-)
-
-
 # Column 2: Diagnostic Interpretation
 with col2:
     st.header("Preliminary Interpretation")
@@ -415,4 +383,35 @@ df_export = pd.DataFrame({
     "Final Conclusion": [st.session_state.get('final_conclusion', "")]
 })
 
+
+df_export = pd.DataFrame({
+    "Age": [age],
+    "Mass Size (mm)": [mass_size],
+    "History of Cancer": [history_cancer],
+    "Reason of Referral": [reason_referral],
+    "Non-contrast CT Used": [use_nc_ct],
+    "Contrast Enhanced CT Used": [use_ce_ct],
+    "Non-contrast HU": [non_contrast_hu],
+    "Venous phase HU": [venous_phase_hu],
+    "Delayed HU": [delayed_hu],
+    "Mass Development": [mass_dev],
+    "Bilateral Finding": [bilateral],
+    "Heterogenicity": [heterogenicity],
+    "Macroscopic Fat": [macro_fat],
+    "Cystic": [cystic],
+    "Calcification": [calcification],
+    "Additional Comments": [additional_comments],
+    "Small Caption Result": [small_caption_result],   # <-- NEW
+    "Final Conclusion": [st.session_state.get('final_conclusion', "")]
+})
+
 csv = df_export.to_csv(index=False, sep=';', encoding='utf-8-sig').encode('utf-8-sig')
+
+st.download_button(
+    label="Save Report as CSV",
+    data=csv,
+    file_name='adrenal_mass_report.csv',
+    mime='text/csv',
+)
+
+
