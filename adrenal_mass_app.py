@@ -124,7 +124,7 @@ with col1:
 
     csv = df_export.to_csv(index=False, sep=';', encoding='utf-8-sig')
 
-    st.download_button(
+   dl_clicked = st.download_button(
         label="Save Report as CSV",
         data=csv,
         file_name='adrenal_mass_report.csv',
@@ -135,7 +135,7 @@ with col1:
 with col2:
     st.header("Preliminary Interpretation")
 
-    if st.button("Assess"):
+    if assess_clicked and dl_clicked:
         if not mass_size or (not use_nc_ct and not use_ce_ct):
             st.warning("Missing input: Please provide lesion size and select at least one imaging modality.")
         else:
@@ -279,7 +279,7 @@ with col3:
 
     final_conclusion = ""
 
-    if st.button("Assess"):
+    if assess_clicked and dl_clicked:
         try:
             size_value = float(mass_size) if mass_size else None
             non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
