@@ -20,6 +20,7 @@ st.caption("This app was developed by Peter Sommer Ulriksen and Reza Piri from R
 col1, col2, col3 = st.columns(3)
 
 # Column 1: Input Data
+# Column 1: Input Data
 with col1:
     st.header("Input Data")
     age = st.text_input("Age")
@@ -74,9 +75,15 @@ with col1:
     additional_comments = st.text_area("Additional Comments")
 
     st.markdown("---")
-    assess_button = st.button("Assess")
-    small_caption_result = ""
+    assess_clicked = st.button("Assess")
+    reset_clicked = st.button("Reset")
+    if reset_clicked:
+        st.session_state.clear()
+        st.experimental_rerun()
+    if assess_clicked:
+        st.session_state.assess_triggered = True
 
+    small_caption_result = ""
     if st.session_state.get("assess_triggered", False):
         try:
             size_value = float(mass_size) if mass_size else None
@@ -96,6 +103,38 @@ with col1:
         elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
             small_caption_result = "Probably malignant"
 
+    st.session_state["small_caption"] = small_caption_result
+
+    import pandas as pd
+    df_export = pd.DataFrame({
+        "Age": [age],
+        "Mass Size (mm)": [mass_size],
+        "History of Cancer": [history_cancer],
+        "Reason of Referral": [reason_referral],
+        "Non-contrast CT Used": [use_nc_ct],
+        "Contrast Enhanced CT Used": [use_ce_ct],
+        "Non-contrast HU": [non_contrast_hu],
+        "Venous phase HU": [venous_phase_hu],
+        "Delayed HU": [delayed_hu],
+        "Mass Development": [mass_dev],
+        "Bilateral Finding": [bilateral],
+        "Heterogenicity": [heterogenicity],
+        "Macroscopic Fat": [macro_fat],
+        "Cystic": [cystic],
+        "Calcification": [calcification],
+        "Additional Comments": [additional_comments],
+        "Small Caption Result": [st.session_state.get("small_caption", "")],
+        "Final Conclusion": [st.session_state.get("final_conclusion", "")]
+    })
+
+    csv = df_export.to_csv(index=False, sep=';', encoding='utf-8-sig')
+
+    st.download_button(
+        label="Save Report as CSV",
+        data=csv,
+        file_name='adrenal_mass_report.csv',
+        mime='text/csv',
+    )
 
 # Column 2: Diagnostic Interpretation
 with col2:
