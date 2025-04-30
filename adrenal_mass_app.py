@@ -135,7 +135,7 @@ with col1:
 with col2:
     st.header("Preliminary Interpretation")
 
-    if st.button("Assess") or st.download_button()
+    if st.button("Assess") or st.download_button("Save Report as CSV"):
         if not mass_size or (not use_nc_ct and not use_ce_ct):
             st.warning("Missing input: Please provide lesion size and select at least one imaging modality.")
         else:
