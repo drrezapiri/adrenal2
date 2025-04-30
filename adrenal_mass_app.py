@@ -279,7 +279,7 @@ with col3:
 
     final_conclusion = ""
 
-    if st.session_state.get("assess_triggered", False):
+     if st.button("Assess") or st.download_button("Save Report as CSV"):
         try:
             size_value = float(mass_size) if mass_size else None
             non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
