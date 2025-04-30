@@ -77,7 +77,7 @@ with col1:
     assess_button = st.button("Assess")
     small_caption_result = ""
 
-    if assess_button:
+    if st.session_state.get("assess_triggered", False):
         try:
             size_value = float(mass_size) if mass_size else None
             non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
@@ -101,7 +101,7 @@ with col1:
 with col2:
     st.header("Preliminary Interpretation")
 
-    if assess_button:
+    if st.session_state.get("assess_triggered", False):
         if not mass_size or (not use_nc_ct and not use_ce_ct):
             st.warning("Missing input: Please provide lesion size and select at least one imaging modality.")
         else:
@@ -245,7 +245,7 @@ with col3:
 
     final_conclusion = ""
 
-    if assess_button:
+    if st.session_state.get("assess_triggered", False):
         try:
             size_value = float(mass_size) if mass_size else None
             non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
