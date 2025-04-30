@@ -135,7 +135,7 @@ with col1:
 with col2:
     st.header("Preliminary Interpretation")
 
-    if st.button("Assess") or st.download_button("Save Report as CSV"):
+    if st.button("Assess"):
         if not mass_size or (not use_nc_ct and not use_ce_ct):
             st.warning("Missing input: Please provide lesion size and select at least one imaging modality.")
         else:
@@ -279,7 +279,7 @@ with col3:
 
     final_conclusion = ""
 
-    if st.button("Assess") or st.download_button("Save Report as CSV"):
+    if st.button("Assess"):
         try:
             size_value = float(mass_size) if mass_size else None
             non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
