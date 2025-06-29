@@ -35,14 +35,18 @@ with col1:
     st.subheader("Modality used")
     use_nc_ct = st.checkbox("Non-contrast CT")
     use_ce_ct = st.checkbox("Contrast enhanced CT")
+    use_de_ct = st.checkbox("Dual-energy CT")
 
-    non_contrast_hu = venous_phase_hu = delayed_hu = ""
+    non_contrast_hu = venous_phase_hu = delayed_hu = virtual_nc_hu = fat_percent = ""
 
     if use_nc_ct:
         non_contrast_hu = st.text_input("Non-contrast HU")
     if use_ce_ct:
         venous_phase_hu = st.text_input("Venous phase HU")
         delayed_hu = st.text_input("Delayed HU")
+    if use_de_ct:
+        virtual_nc_hu = st.text_input("Virtual non-contrast HU")
+        fat_percent = st.text_input("Fat percent (%)")
 
     st.markdown("---")
     st.subheader("Radiologic Features")
@@ -95,7 +99,6 @@ with col1:
             small_caption_result = "Possibly malignant"
         elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
             small_caption_result = "Probably malignant"
-
 
 # Column 2: Diagnostic Interpretation
 with col2:
