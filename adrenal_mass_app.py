@@ -1,153 +1,120 @@
-    
-
-
+2
 
 
 import streamlit as st
 import pandas as pd
+
+
 # Set page configuration
 st.set_page_config(
-    page_title="Adrenal Mass Approach",
-    page_icon="🩺",
-    layout="wide"
+page_title="Adrenal Mass Approach",
+page_icon="🯪",
+layout="wide"
 )
+
 
 # Title and credits
 st.title("Adrenal Mass Approach")
 st.caption("This app was developed by Peter Sommer Ulriksen and Reza Piri from Radiology Department in Rigshospitalet")
 
+
 # Create three columns
 col1, col2, col3 = st.columns(3)
 
+
 # Column 1: Input Data
 with col1:
-    st.header("Input Data")
-    age = st.text_input("Age")
-    mass_size = st.text_input("Mass size in mm (short axis)")
-    history_cancer = st.checkbox("History of cancer")
+st.header("Input Data")
+age = st.text_input("Age")
+mass_size = st.text_input("Mass size in mm (short axis)")
+history_cancer = st.checkbox("History of cancer")
 
-    reason_referral = st.selectbox(
-        "Reason of referral",
-        ["Cancer work-up", "Hormonal imbalance", "Incidentaloma"]
-    )
 
-    st.markdown("---")
-    st.subheader("Modality used")
-    use_nc_ct = st.checkbox("Non-contrast CT")
-    use_ce_ct = st.checkbox("Contrast enhanced CT")
-    use_de_ct = st.checkbox("Dual-energy CT")
+reason_referral = st.selectbox(
+"Reason of referral",
+["Cancer work-up", "Hormonal imbalance", "Incidentaloma"]
+)
 
-    non_contrast_hu = venous_phase_hu = delayed_hu = virtual_nc_hu = fat_percent = ""
 
-    if use_nc_ct:
-        non_contrast_hu = st.text_input("Non-contrast HU")
-    if use_ce_ct:
-        venous_phase_hu = st.text_input("Venous phase HU")
-        delayed_hu = st.text_input("Delayed HU")
-    if use_de_ct:
-        virtual_nc_hu = st.text_input("Virtual non-contrast HU")
-        fat_percent = st.text_input("Fat percent (%)")
+st.markdown("---")
+st.subheader("Modality used")
+use_nc_ct = st.checkbox("Non-contrast CT")
+use_ce_ct = st.checkbox("Contrast enhanced CT")
+use_de_ct = st.checkbox("Dual-energy CT")
 
-    st.markdown("---")
-    st.subheader("Radiologic Features")
 
-    mass_dev = st.selectbox(
-        "Mass development",
-        ["No prior scanning", "Increased >5 mm/year", "Increased <5 mm/year", "In doubt"]
-    )
-    bilateral = st.checkbox("Bilateral finding")
-    heterogenicity = st.selectbox("Heterogenicity", ["", "Homogen", "Heterogen"])
+non_contrast_hu = venous_phase_hu = delayed_hu = virtual_nc_hu = fat_percent = ""
 
-    macro_fat_forced = False
-    try:
-        if (use_nc_ct and non_contrast_hu and float(non_contrast_hu) < 0) or (use_ce_ct and venous_phase_hu and float(venous_phase_hu) < 0):
-            macro_fat_forced = True
-    except ValueError:
-        pass
 
-    if macro_fat_forced:
-        macro_fat = True
-        st.checkbox("Sign of macroscopic fat", value=True, disabled=True)
-        st.caption("Detected negative HU value → macroscopic fat automatically set.")
-    else:
-        macro_fat = st.checkbox("Sign of macroscopic fat")
+if use_nc_ct:
+non_contrast_hu = st.text_input("Non-contrast HU")
+if use_ce_ct:
+venous_phase_hu = st.text_input("Venous phase HU")
+delayed_hu = st.text_input("Delayed HU")
+if use_de_ct:
+virtual_nc_hu = st.text_input("Virtual non-contrast HU")
+fat_percent = st.text_input("Fat percent (%)")
 
-    cystic = st.checkbox("Cystic")
-    calcification = st.checkbox("Calcification")
 
-    additional_comments = st.text_area("Additional Comments")
+st.markdown("---")
+st.subheader("Radiologic Features")
 
-    st.markdown("---")
-    assess_button = st.button("Assess")
-    small_caption_result = ""
 
-    if assess_button:
-        try:
-            size_value = float(mass_size) if mass_size else None
-            non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
-            venous_val = float(venous_phase_hu) if venous_phase_hu else None
-        except:
-            size_value = non_contrast_val = venous_val = None
+mass_dev = st.selectbox(
+"Mass development",
+["No prior scanning", "Increased >5 mm/year", "Increased <5 mm/year", "In doubt"]
+)
+bilateral = st.checkbox("Bilateral finding")
+heterogenicity = st.selectbox("Heterogenicity", ["", "Homogen", "Heterogen"])
 
-        if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
-            small_caption_result = "Benign"
-        elif ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) or (size_value is not None and size_value < 10):
-            small_caption_result = "Probably benign"
-        elif ((non_contrast_val is not None and non_contrast_val < 20) or (venous_val is not None and venous_val < 20)) and (size_value is not None and size_value < 20):
-            small_caption_result = "Probably benign"
-        elif ((non_contrast_val is not None and non_contrast_val < 40) or (venous_val is not None and venous_val < 40)) and (size_value is not None and size_value < 40):
-            small_caption_result = "Possibly malignant"
-        elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
-            small_caption_result = "Probably malignant"
 
-# Column 2: Diagnostic Interpretation
-with col2:
-    st.header("Preliminary Interpretation")
+macro_fat_forced = False
+try:
+if (use_nc_ct and non_contrast_hu and float(non_contrast_hu) < 0) or (use_ce_ct and venous_phase_hu and float(venous_phase_hu) < 0):
+macro_fat_forced = True
+except ValueError:
+pass
 
-    if assess_button:
-        if not mass_size or (not use_nc_ct and not use_ce_ct):
-            st.warning("Missing input: Please provide lesion size and select at least one imaging modality.")
-        else:
-            benign_reasons = []
-            malignant_reasons = []
-            complementary_comments = []
-            probability_comments = []
-            abs_washout = rel_washout = None
 
-            try:
-                size_value = float(mass_size) if mass_size else None
-                non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
-                venous_val = float(venous_phase_hu) if venous_phase_hu else None
-                delayed_val = float(delayed_hu) if delayed_hu else None
-                age_val = int(age) if age else None
-            except ValueError:
-                st.warning("Please make sure age, HU, and size values are valid numbers.")
-                size_value = non_contrast_val = venous_val = delayed_val = age_val = None
+if macro_fat_forced:
+macro_fat = True
+st.checkbox("Sign of macroscopic fat", value=True, disabled=True)
+st.caption("Detected negative HU value → macroscopic fat automatically set.")
+else:
+macro_fat = st.checkbox("Sign of macroscopic fat")
 
-            if macro_fat:
-                benign_reasons.append("macroscopic fat")
-                complementary_comments.append("Probably myelolipoma – no follow-up needed.")
-            if calcification:
-                benign_reasons.append("calcification")
-            if size_value is not None and size_value < 10:
-                benign_reasons.append("size smaller than 1 cm")
-            if non_contrast_val is not None and non_contrast_val <= 10:
-                benign_reasons.append("HU non-contrast ≤ 10")
-            if venous_val is not None and venous_val <= 10:
-                benign_reasons.append("HU venous ≤ 10")
-            if mass_dev == "Increased <5 mm/year":
-                benign_reasons.append("no significant growth")
-            if non_contrast_val is not None and venous_val is not None:
-                if venous_val - non_contrast_val < 10:
-                    benign_reasons.append("no enhancement (HU change < 10)")
 
-            # Malignant features
+cystic = st.checkbox("Cystic")
+calcification = st.checkbox("Calcification")
+additional_comments = st.text_area("Additional Comments")
+st.markdown("---")
+assess_button = st.button("Assess")
+small_caption_result = ""
+
+
+if assess_button:
+try:
+size_value = float(mass_size) if mass_size else None
+non_contrast_val = float(non_contrast_hu) if non_contrast_hu else None
+venous_val = float(venous_phase_hu) if venous_phase_hu else None
+except:
+size_value = non_contrast_val = venous_val = None
+
+
+if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
+small_caption_result = "Benign"
+elif ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) or (size_value is not None and size_value < 10):
+benign_reasons.append("no enhancement (HU change < 10)")
+  # Malignant features
             if venous_val is not None and non_contrast_val is not None:
-                if venous_val - non_contrast_val > 10:
-                    malignant_reasons.append("enhancement (HU change > 10)")
+                if venous_val - non_contrast_val > 20:
+                    malignant_reasons.append("enhancement (HU change > 20)")
             elif venous_val is not None and non_contrast_val is None:
                 if venous_val > 40:
                     malignant_reasons.append("HU venous > 40 (no non-contrast available)")
+if fat_percent_val is not None and fat_percent_val > 24:
+    benign_reasons.append("fat percent > 24% on DECT")
+    complementary_comments.append("High fat percentage on dual-energy CT is a benign feature.")
 
             if bilateral:
                 malignant_reasons.append("bilateral finding")
@@ -157,8 +124,8 @@ with col2:
             if venous_val is not None and non_contrast_val is not None:
                 if (venous_val > 20 or non_contrast_val > 20) and not (venous_val - non_contrast_val < 10 and venous_val > 20):
                     malignant_reasons.append("high HU >20 without hematoma pattern")
-            if size_value is not None and size_value > 40:
-                malignant_reasons.append("size > 4 cm")
+            if size_value is not None and size_value > 34:
+                malignant_reasons.append("size > 3.4 cm")
             if heterogenicity == "Heterogen":
                 malignant_reasons.append("heterogenicity")
 
@@ -284,35 +251,57 @@ with col3:
                     malignant_signs.append("relative washout <40%")
             except ZeroDivisionError:
                 pass
-
-        # Immediate small caption
-        if ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) and (size_value is not None and size_value < 10):
-            st.markdown("<p style='color:green;'>Benign</p>", unsafe_allow_html=True)
-        elif ((non_contrast_val is not None and non_contrast_val < 10) or (venous_val is not None and venous_val < 10)) or (size_value is not None and size_value < 10):
-            st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
-        elif ((non_contrast_val is not None and non_contrast_val < 20) or (venous_val is not None and venous_val < 20)) and (size_value is not None and size_value < 20):
-            st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
-        elif ((non_contrast_val is not None and non_contrast_val < 40) or (venous_val is not None and venous_val < 40)) and (size_value is not None and size_value < 40):
-            st.markdown("<p style='color:red;'>Possibly malignant</p>", unsafe_allow_html=True)
-        elif ((non_contrast_val is not None and non_contrast_val > 40) or (venous_val is not None and venous_val > 40)) or (size_value is not None and size_value > 40):
-            st.markdown("<p style='color:red;'>Probably malignant</p>", unsafe_allow_html=True)
-
+# Immediate small caption
+if (
+    (non_contrast_val is not None and non_contrast_val < 10) or
+    (venous_val is not None and venous_val < 10)
+) and (size_value is not None and size_value < 10):
+    st.markdown("<p style='color:green;'>Benign</p>", unsafe_allow_html=True)
+elif (
+    (non_contrast_val is not None and non_contrast_val < 10) or
+    (venous_val is not None and venous_val < 10)
+) or (size_value is not None and size_value < 10):
+    st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
+elif (
+    (non_contrast_val is not None and non_contrast_val < 20) or
+    (venous_val is not None and venous_val < 20)
+) and (size_value is not None and size_value < 20):
+    st.markdown("<p style='color:green;'>Probably benign</p>", unsafe_allow_html=True)
+elif (
+    (non_contrast_val is not None and non_contrast_val < 40) or
+    (venous_val is not None and venous_val < 40)
+) and (size_value is not None and size_value < 40):
+    st.markdown("<p style='color:red;'>Possibly malignant</p>", unsafe_allow_html=True)
+elif (
+    (
+        ((non_contrast_val is not None and non_contrast_val > 40) or
+         (venous_val is not None and venous_val > 40)) and
+        (venous_val is not None and non_contrast_val is not None and venous_val - non_contrast_val > 10)
+    ) or
+    (size_value is not None and size_value > 34)
+):
+    st.markdown("<p style='color:red;'>Probably malignant</p>", unsafe_allow_html=True)
 
         # Final Conclusion full rules
-        if size_value is not None and size_value >= 40:
-            if history_cancer:
-                final_conclusion = "Consider biopsy or PET-CT, also consider biochemical assays."
-            else:
-                final_conclusion = "Consider Resection and biochemical assays."
-        elif macro_fat:
+      if size_value is not None and size_value >= 40:
+low_attenuation_present = (
+(non_contrast_val is not None and non_contrast_val <= 20) or
+(venous_val is not None and venous_val <= 20)
+)
+if not macro_fat or not low_attenuation_present:
+if history_cancer:
+final_conclusion = "Consider biopsy or PET-CT, also consider biochemical assays."
+else:
+final_conclusion = "Consider Resection and biochemical assays."
+        elif macro_fat or and fat_percent_val > 24:
             final_conclusion = "The mass is probably a Myelolipoma. No follow-up needed."
             if malignant_signs:
                 final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, Consider biochemical assays to determine functional status."
-        elif non_contrast_val is not None and venous_val is not None and (venous_val - non_contrast_val < 10) and venous_val > 20:
+        elif non_contrast_val is not None and venous_val is not None and (venous_val - non_contrast_val < 20) and venous_val > 20:
             final_conclusion = "There is a hematoma enhancement pattern. No follow-up needed."
             if malignant_signs:
                 final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, Consider biochemical assays to determine functional status."
-        elif (non_contrast_val is not None and non_contrast_val <= 10) or (venous_val is not None and venous_val <= 10):
+        elif (non_contrast_val is not None and non_contrast_val <= 20) or (venous_val is not None and venous_val <= 20):
             final_conclusion = "Due to low attenuation, no follow-up needed."
             if malignant_signs:
                 final_conclusion += f" But, due to the existence of {', '.join(malignant_signs)}, Consider biochemical assays to determine functional status."
@@ -344,7 +333,7 @@ with col3:
             if non_contrast_val is None or venous_val is None or delayed_val is None:
                 final_conclusion = "Consider Adrenal CT."
             else:
-                if (venous_val - non_contrast_val < 10) or (non_contrast_val is not None and non_contrast_val <= 10):
+                if (venous_val - non_contrast_val < 20) or (non_contrast_val is not None and non_contrast_val <= 20):
                     final_conclusion = "Probably benign. No follow-up needed."
                 elif abs_washout > 60 and rel_washout > 40:
                     final_conclusion = "Probably benign, No follow-up needed, but biochemical assays to determine functional status can be considered."
@@ -354,7 +343,7 @@ with col3:
             if non_contrast_val is None or venous_val is None or delayed_val is None:
                 final_conclusion = "Consider Adrenal CT."
             else:
-                if (venous_val - non_contrast_val < 10) or (non_contrast_val is not None and non_contrast_val <= 10):
+                if (venous_val - non_contrast_val < 20) or (non_contrast_val is not None and non_contrast_val <= 20):
                     final_conclusion = "Probably benign. No follow-up needed."
                 elif abs_washout > 60 and rel_washout > 40:
                     final_conclusion = "Probably benign. No follow-up needed. Biochemical assays may be considered."
@@ -416,4 +405,3 @@ st.download_button(
     file_name='adrenal_mass_report.csv',
     mime='text/csv',
 )
-
